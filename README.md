@@ -2,6 +2,10 @@
 
 基于 TCP 的简单文件传输示例，使用 C++ 实现客户端/服务端，通过 Socket 发送本地文件并在服务端保存。
 
+## 演示
+
+![文件传输演示](./演示.gif)
+
 ## 功能
 
 - 客户端连接服务端后，可交互式选择发送文件或退出
@@ -88,6 +92,7 @@ build/files/your_file.txt
 ├── tcp_config.h      # 网络与缓冲区配置
 ├── file_server.cpp   # 服务端
 ├── file_client.cpp   # 客户端
+├── 演示.gif          # 使用演示
 └── README.md
 ```
 

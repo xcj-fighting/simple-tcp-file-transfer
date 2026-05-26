@@ -171,6 +171,6 @@ bool send_file()
     }
 
     send_file.close();
-    cout << "文件发送完成!\n";
+    cout << "文件发送完成!\n\n";
     return true;
 }

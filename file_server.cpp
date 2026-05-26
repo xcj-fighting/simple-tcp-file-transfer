@@ -154,38 +154,40 @@ void recv_file(int client_sockfd, ofstream& file, uint64_t file_size)
 
 void handle_client(int client_sockfd)
 {
-    string filename = recv_filename(client_sockfd);
-    if (filename.empty())
+    while(1)
     {
-        close(client_sockfd);
-        return;
+        string filename = recv_filename(client_sockfd);
+        if (filename.empty())
+        {
+            close(client_sockfd);
+            return;
+        }
+    
+        uint64_t filesize = recv_filesize(client_sockfd);
+        if (filesize <= 0)
+        {
+            close(client_sockfd);
+            return;
+        }
+    
+        if (!create_local_folder())
+        {
+            cerr << "create dir error\n";
+            close(client_sockfd);
+            return;
+        }
+    
+        string file_abosulte_path = filesystem::current_path().string() + "/" + Config::SERVER_FILE_DIR_NAME + "/" + filename;
+        ofstream file(file_abosulte_path, ios_base::binary);
+        if (!file)
+        {
+            std::error_code ec;
+            filesystem::file_status file_status = filesystem::status(file_abosulte_path, ec);
+            cerr << "打开文件失败：" << ec.message() << std::endl;
+            close(client_sockfd);
+            return;
+        }
+    
+        recv_file(client_sockfd, file, filesize);
     }
-
-    uint64_t filesize = recv_filesize(client_sockfd);
-    if (filesize <= 0)
-    {
-        close(client_sockfd);
-        return;
-    }
-
-    if (!create_local_folder())
-    {
-        cerr << "create dir error\n";
-        close(client_sockfd);
-        return;
-    }
-
-    string file_abosulte_path = filesystem::current_path().string() + "/" + Config::SERVER_FILE_DIR_NAME + "/" + filename;
-    ofstream file(file_abosulte_path, ios_base::binary);
-    if (!file)
-    {
-        std::error_code ec;
-        filesystem::file_status file_status = filesystem::status(file_abosulte_path, ec);
-        cerr << "打开文件失败：" << ec.message() << std::endl;
-        return;
-    }
-
-    recv_file(client_sockfd, file, filesize);
-
-    close(client_sockfd);
 }
